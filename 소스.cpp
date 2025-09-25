@@ -2,15 +2,17 @@
 #include <stdlib.h>
 #define SIZE 100
 
-void Most_sold(int* product, int* ID, int* sale_num, int sale[]);
-void Least_sold(int* product, int* ID, int* sale_num, int sale[]);
+void Most_sold(int* product, int* ID, int* sale_num, int sale[], char product_name[][SIZE]);
+void Least_sold(int* product, int* ID, int* sale_num, int sale[], char product_name[][SIZE]);
 void Total_individual_inventory(int* product_num, int* ID, int*case1_num, int inventory[]);
 void Total_individual_sale(int* product_num, int* ID, int* case2_num, int sale[]);
-void product_status(int* product_num, int* ID, int* T_inven, int* T_sales, int* sale_num, int stock[], int inventory[], int sale[]);
+void product_status(int* product_num, int* ID, int* T_inven, int* T_sales, int* sale_num, int stock[], int inventory[], int sale[], char product_name[][SIZE]);
+void Product_name(int* product_num, char product_name[][SIZE]);
 
 int main(void)
 {
 	int product_num = 0;
+	char product_name[SIZE][SIZE] = {};
 	int inventory[SIZE] = {};
 	int sale[SIZE] = {};
 	int stock[SIZE] = {};
@@ -24,7 +26,7 @@ int main(void)
 		int case_num;
 		int case1_num;
 		int case2_num;
-		printf("원하는 메뉴를 선택하세요.(1.입고, 2.판매, 3.상품현황, 4.종료)\n");
+		printf("원하는 메뉴를 선택하세요.(1.입고, 2.판매, 3.상품현황, 4.상품명 입력 5.종료)\n");
 		scanf_s("%d", &case_num);
 		printf("\n");
 		switch (case_num)
@@ -42,9 +44,12 @@ int main(void)
 			Total_individual_sale(&product_num, &ID, &case2_num, &sale[0]);
 			break;
 		case 3:
-			product_status(&product_num, &ID, &T_inven, &T_sales, &sale_num, &stock[0], &inventory[0], &sale[0]);
+			product_status(&product_num, &ID, &T_inven, &T_sales, &sale_num, &stock[0], &inventory[0], &sale[0], product_name);
 			break;
 		case 4:
+			Product_name(&product_num, product_name);
+			break;
+		case 5:
 			return false;
 		}
 	}
@@ -94,7 +99,7 @@ void Total_individual_sale(int* product_num, int* ID, int* case2_num, int sale[]
 	}
 }
 
-void product_status(int* product_num, int* ID, int* T_inven, int* T_sales, int* sale_num, int stock[], int inventory[], int sale[])
+void product_status(int* product_num, int* ID, int* T_inven, int* T_sales, int* sale_num, int stock[], int inventory[], int sale[], char product_name[][SIZE])
 {
 	for (int i = 0; i < *product_num; i++)
 		stock[i] = inventory[i] - sale[i];
@@ -111,18 +116,29 @@ void product_status(int* product_num, int* ID, int* T_inven, int* T_sales, int* 
 	}
 	printf("총 판매량: %d개 (판매율 %.2f%%)\n", *T_sales, (((float)*T_sales / *T_inven) * 100));
 
-	Most_sold(product_num, ID, sale_num, &sale[0]);
-	Least_sold(product_num, ID, sale_num, &sale[0]);
+	Most_sold(product_num, ID, sale_num, &sale[0], product_name);
+	Least_sold(product_num, ID, sale_num, &sale[0], product_name);
 
 	for (int i = 0; i < *product_num; i++)
 	{
 		if (stock[i] <= 2)
-			printf("상품 ID %d : 재고부족(%d)\n", i, stock[i]);
+			printf("상품 ID %d : 상품명 : %s 재고부족(%d)\n", i + 1, product_name[i
+			], stock[i]);
 	}
 	printf("\n");
 }
 
-void Most_sold(int* product, int* ID, int* sale_num, int sale[])
+void Product_name(int* product_num, char product_name[][SIZE])
+{
+	for (int i = 0; i < *product_num; i++)
+	{
+		printf("ID %d 상품명 : ", i + 1);
+		scanf_s("%s", product_name[i], (unsigned int)SIZE);
+		printf("\n");
+	}
+}
+
+void Most_sold(int* product, int* ID, int* sale_num, int sale[], char product_name[][SIZE])
 {
 	*ID = 1;
 	*sale_num = sale[0];
@@ -134,10 +150,10 @@ void Most_sold(int* product, int* ID, int* sale_num, int sale[])
 			*ID = (i + 1);
 		}
 	}
-	printf("가장 많이 판매된 상품 : ID %d, 판매량 %d\n", *ID, *sale_num);
+	printf("가장 많이 판매된 상품 : ID %d, 상품명 : %s, 판매량 %d\n", *ID, product_name[*ID - 1], *sale_num);
 }
 
-void Least_sold(int* product, int* ID, int* sale_num, int sale[])
+void Least_sold(int* product, int* ID, int* sale_num, int sale[], char product_name[][SIZE])
 {
 	*ID = 1;
 	*sale_num = sale[0];
@@ -149,5 +165,5 @@ void Least_sold(int* product, int* ID, int* sale_num, int sale[])
 			*ID = (i + 1);
 		}
 	}
-	printf("가장 적게 판매된 상품 : ID %d, 판매량 %d\n", *ID, *sale_num);
+	printf("가장 적게 판매된 상품 : ID %d, 상품명 : %s, 판매량 %d\n", *ID, product_name[*ID - 1], *sale_num);
 }
