@@ -1,169 +1,295 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define SIZE 100
+#define MAX_PRODUCTS 5
 
-void Most_sold(int* product, int* ID, int* sale_num, int sale[], char product_name[][SIZE]);
-void Least_sold(int* product, int* ID, int* sale_num, int sale[], char product_name[][SIZE]);
-void Total_individual_inventory(int* product_num, int* ID, int*case1_num, int inventory[]);
-void Total_individual_sale(int* product_num, int* ID, int* case2_num, int sale[]);
-void product_status(int* product_num, int* ID, int* T_inven, int* T_sales, int* sale_num, int stock[], int inventory[], int sale[], char product_name[][SIZE]);
-void Product_name(int* product_num, char product_name[][SIZE]);
+typedef struct {
+	int id;
+	char name[SIZE];
+	int inventory;
+	int sale;
+	int price;
+}PRODUCT;
+
+void Most_sold(int sale[], char product_name[][SIZE]);
+void Least_sold(int sale[], char product_name[][SIZE]);
+void Total_individual_inventory(int inventory[], char product_name[][SIZE], int price[]);
+void Total_individual_sale(int inventory[], int sale[], char product_name[][SIZE]);
+void product_status(char product_name[][SIZE], int inventory[], int sale[], int price[]);
+void product_all_status(int stock[], int inventory[], int sale[], char product_name[][SIZE]);
+void save_data(int inventory[], int sale[], int price[], char product_name[][SIZE]);
+void load_data(int inventory[], int sale[], int price[], char product_name[][SIZE]);
 
 int main(void)
 {
-	int product_num = 0;
 	char product_name[SIZE][SIZE] = {};
 	int inventory[SIZE] = {};
 	int sale[SIZE] = {};
 	int stock[SIZE] = {};
-	int ID = 0;
-	int T_inven = 0;
-	int T_sales = 0;
-	int sale_num = sale[0];
+	int price[SIZE] = {};
 
 	while (true)
 	{
 		int case_num;
-		int case1_num;
-		int case2_num;
-		printf("¿øÇÏ´Â ¸Ş´º¸¦ ¼±ÅÃÇÏ¼¼¿ä.(1.ÀÔ°í, 2.ÆÇ¸Å, 3.»óÇ°ÇöÈ², 4.»óÇ°¸í ÀÔ·Â 5.Á¾·á)\n");
+		printf("=================================================================\n");
+		printf("ì›í•˜ëŠ” ë©”ë‰´ë¥¼ ì„ íƒí•˜ì„¸ìš”.(1.ì…ê³ , 2.íŒë§¤, 3.ê°œë³„í˜„í™©, 4.ì „ì²´í˜„í™© 5.ì €ì¥ 6.ë¶ˆëŸ¬ì˜¤ê¸° 7.ì¢…ë£Œ)\n");
+		printf(">> ");
 		scanf_s("%d", &case_num);
 		printf("\n");
+
 		switch (case_num)
 		{
 		case 1:
-			printf("ÀÔ°í¼ö·® ÀÔ·Â: ÀüÃ¼ »óÇ° ÀÔ°í¼ö·® ÀÔ·Â 1, °³º° »óÇ° ÀÔ·Â 2¸¦ ¼±ÅÃ\n");
-			scanf_s("%d", &case1_num); printf("\n");
-
-			Total_individual_inventory(&product_num, &ID, &case1_num, &inventory[0]);
+			Total_individual_inventory(inventory, product_name, price);
 			break;
 		case 2:
-			printf("ÆÇ¸Å¼ö·® ÀÔ·Â: ÀüÃ¼ »óÇ° ÆÇ¸Å¼ö·® ÀÔ·Â 1, °³º° »óÇ° ÀÔ·Â 2¸¦ ¼±ÅÃ\n");
-			scanf_s("%d", &case2_num); printf("\n");
-
-			Total_individual_sale(&product_num, &ID, &case2_num, &sale[0]);
+			Total_individual_sale(inventory, sale, product_name);
 			break;
 		case 3:
-			product_status(&product_num, &ID, &T_inven, &T_sales, &sale_num, &stock[0], &inventory[0], &sale[0], product_name);
+			product_status(product_name, inventory, sale, price);
 			break;
 		case 4:
-			Product_name(&product_num, product_name);
+			product_all_status(stock, inventory, sale, product_name);
 			break;
 		case 5:
-			return false;
+			save_data(inventory, sale, price, product_name);
+			break;
+		case 6:
+			load_data(inventory, sale, price, product_name);
+			break;
+		case 7:
+			return 0;
+		default:
+			printf("1~5 ì‚¬ì´ì˜ ìˆ«ìë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n\n");
+			break;
 		}
 	}
 	return 0;
 }
 
-void Total_individual_inventory(int* product_num, int* ID, int* case1_num, int inventory[])
+void Total_individual_inventory(int inventory[], char product_name[][SIZE], int price[])
 {
-	switch (* case1_num)
-	{
-	case 1:
-		printf("»óÇ° °³¼ö ÀÔ·Â: ");
-		scanf_s("%d", product_num); printf("\n");
+	int user_id;
 
-		printf("ÀüÃ¼ »óÇ°ÀÇ ÀÔ°í¼ö·®À» ÀÔ·Â: ");
-		for (int i = 0; i < *product_num; i++)
-			scanf_s(" %d", &inventory[i]); printf("\n");
-		break;
-	case 2:
-		printf("\n");
-		printf("»óÇ°ID: ");
-		scanf_s("%d", ID); printf("\n");
-
-		printf("ÀÔ°í¼ö·®: ");
-		scanf_s("%d", &inventory[*ID]); printf("\n");
-		break;
-	}
-}
-
-void Total_individual_sale(int* product_num, int* ID, int* case2_num, int sale[])
-{
-	switch (* case2_num)
-	{
-	case 1:
-		printf("ÀüÃ¼ »óÇ° ÆÇ¸Å¼ö·®À» ÀÔ·Â(%d°³): ", *product_num);
-		for (int i = 0; i < *product_num; i++)
-			scanf_s(" %d", &sale[i]); printf("\n");
-		break;
-	case 2:
-		printf("\n");
-		printf("»óÇ°ID: ");
-		scanf_s("%d", ID); printf("\n");
-
-		printf("ÆÇ¸Å¼ö·®: ");
-		scanf_s("%d", &sale[*ID]); printf("\n");
-		break;
-	}
-}
-
-void product_status(int* product_num, int* ID, int* T_inven, int* T_sales, int* sale_num, int stock[], int inventory[], int sale[], char product_name[][SIZE])
-{
-	for (int i = 0; i < *product_num; i++)
-		stock[i] = inventory[i] - sale[i];
-
-	printf("¸ğµç »óÇ°ÀÇ Àç°í ¼ö·®: ");
-	for (int i = 0; i < *product_num; i++)
-		printf("%d ", stock[i]);
+	printf("\n");
+	printf("ìƒí’ˆ IDë¥¼ ì…ë ¥í•˜ì„¸ìš” (1 ~ %d): ", MAX_PRODUCTS);
+	scanf_s("%d", &user_id);
 	printf("\n");
 
-	for (int i = 0; i < *product_num; i++)
+	if (user_id < 1 || user_id > MAX_PRODUCTS)
 	{
-		*T_sales += sale[i];
-		*T_inven += inventory[i];
+		printf("ì˜¤ë¥˜: IDëŠ” 1ë¶€í„° %d ì‚¬ì´ì˜ ìˆ«ìë§Œ ì…ë ¥í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.\n", 5);
+		return;
 	}
-	printf("ÃÑ ÆÇ¸Å·®: %d°³ (ÆÇ¸ÅÀ² %.2f%%)\n", *T_sales, (((float)*T_sales / *T_inven) * 100));
 
-	Most_sold(product_num, ID, sale_num, &sale[0], product_name);
-	Least_sold(product_num, ID, sale_num, &sale[0], product_name);
+	int index = user_id;
+	printf("ìƒí’ˆëª… : ");
+	scanf_s("%s", product_name[index], (unsigned int)SIZE);
+	printf("\n");
 
-	for (int i = 0; i < *product_num; i++)
-	{
-		if (stock[i] <= 2)
-			printf("»óÇ° ID %d : »óÇ°¸í : %s Àç°íºÎÁ·(%d)\n", i + 1, product_name[i
-			], stock[i]);
-	}
+	printf("ì…ê³ ìˆ˜ëŸ‰: ");
+	scanf_s("%d", &inventory[index]);
+	printf("\n");
+
+	printf("íŒë§¤ê°€ê²©: ");
+	scanf_s("%d", &price[index]);
 	printf("\n");
 }
 
-void Product_name(int* product_num, char product_name[][SIZE])
+void Total_individual_sale(int inventory[], int sale[], char product_name[][SIZE])
 {
-	for (int i = 0; i < *product_num; i++)
+	int id;
+	printf("\n");
+	printf("ìƒí’ˆID: ");
+	scanf_s("%d", &id);
+	printf("\n");
+
+	if (id < 1 || id > MAX_PRODUCTS || product_name[id][0] == '\0')
 	{
-		printf("ID %d »óÇ°¸í : ", i + 1);
-		scanf_s("%s", product_name[i], (unsigned int)SIZE);
+		printf("ì˜¤ë¥˜: í•´ë‹¹ IDë¡œ ë“±ë¡ëœ ìƒí’ˆì´ ì—†ê±°ë‚˜ ìœ íš¨í•˜ì§€ ì•Šì€ IDì…ë‹ˆë‹¤.\n\n");
+		return;
+	}
+
+	int current_stock = inventory[id] - sale[id];
+	printf("ìƒí’ˆëª…: %s, í˜„ì¬ ì¬ê³ : %d\n", product_name[id], current_stock);
+
+	printf("íŒë§¤ìˆ˜ëŸ‰: ");
+	int sell_count;
+	scanf_s("%d", &sell_count);
+	printf("\n");
+
+	if (sell_count <= 0)
+	{
+		printf("ì˜¤ë¥˜: íŒë§¤ ìˆ˜ëŸ‰ì€ 1 ì´ìƒì´ì–´ì•¼ í•©ë‹ˆë‹¤.\n\n");
+		return;
+	}
+
+	if (sell_count > current_stock)
+	{
+		printf("ì˜¤ë¥˜: ì¬ê³ ê°€ ë¶€ì¡±í•©ë‹ˆë‹¤.\n\n");
+		return;
+	}
+
+	sale[id] += sell_count;
+	printf("\n íŒë§¤ ì™„ë£Œ (ë‚¨ì€ ì¬ê³ : %d)\n\n", inventory[id] - sale[id]);
+}
+
+void product_status(char product_name[][SIZE], int inventory[], int sale[], int price[]) {
+	int id;
+	printf("\n");
+	printf("ìƒí’ˆID: ");
+	scanf_s("%d", &id);
+	printf("\n");
+
+	if (id < 1 || id > MAX_PRODUCTS || product_name[id][0] == '\0')
+	{
+		printf("ì˜¤ë¥˜: í•´ë‹¹ IDë¡œ ë“±ë¡ëœ ìƒí’ˆì´ ì—†ê±°ë‚˜ ìœ íš¨í•˜ì§€ ì•Šì€ IDì…ë‹ˆë‹¤.\n\n");
+		return;
+	}
+
+	printf("ìƒí’ˆëª…: %s\n", product_name[id]);
+	printf("ì…ê³ ìˆ˜ëŸ‰: %d\n", inventory[id]);
+	printf("íŒë§¤ê°€ê²©: %dì›\n", price[id]);
+}
+
+void product_all_status(int stock[], int inventory[], int sale[], char product_name[][SIZE])
+{
+	int T_sales = 0;
+	int T_inven = 0;
+	int registered_products = 0; //ìƒí’ˆ ê°¯ìˆ˜ ìƒˆëŠ”ê±°
+
+	for (int i = 1; i <= MAX_PRODUCTS; i++)
+	{
+		if (product_name[i][0] != '\0')
+		{
+			registered_products++;
+			stock[i] = inventory[i] - sale[i];
+			printf("ID %d (%s) ì¬ê³ : %d\n", i, product_name[i], stock[i]);
+
+			T_sales += sale[i];
+			T_inven += inventory[i];
+
+			if (stock[i] <= 2)
+				printf("ìƒí’ˆ ID %d : ìƒí’ˆëª… : %s ì¬ê³ ë¶€ì¡±(%d)\n", i, product_name[i], stock[i]);
+		}
+	}
+
+	if (registered_products > 0)
+	{
+		printf("ì´ íŒë§¤ëŸ‰: %dê°œ (íŒë§¤ìœ¨ %.2f%%)\n\n", T_sales, (T_inven > 0) ? (((float)T_sales / T_inven) * 100) : 0.0);
+		Most_sold(&sale[0], product_name);
+		Least_sold(&sale[0], product_name);
 		printf("\n");
 	}
+	else
+		printf("ì•„ì§ ì…ê³ ëœ ìƒí’ˆì´ ì—†ìŠµë‹ˆë‹¤.\n\n");
+
 }
 
-void Most_sold(int* product, int* ID, int* sale_num, int sale[], char product_name[][SIZE])
+void Most_sold(int sale[], char product_name[][SIZE])
 {
-	*ID = 1;
-	*sale_num = sale[0];
-	for (int i = 0; i < *product; i++)
+	int id = -1;
+	int sales = -1;
+
+	for (int i = 1; i <= MAX_PRODUCTS; i++)
 	{
-		if (*sale_num < sale[i])
+		if (product_name[i][0] != '\0')
 		{
-			*sale_num = sale[i];
-			*ID = (i + 1);
+			if (id == -1 || sale[i] > sales)
+			{
+				sales = sale[i];
+				id = i;
+			}
 		}
 	}
-	printf("°¡Àå ¸¹ÀÌ ÆÇ¸ÅµÈ »óÇ° : ID %d, »óÇ°¸í : %s, ÆÇ¸Å·® %d\n", *ID, product_name[*ID - 1], *sale_num);
+
+	if (id != -1)
+		printf("ê°€ì¥ ë§ì´ íŒë§¤ëœ ìƒí’ˆ : ID %d, ìƒí’ˆëª… : %s, íŒë§¤ëŸ‰ %d\n", id, product_name[id], sales);
 }
 
-void Least_sold(int* product, int* ID, int* sale_num, int sale[], char product_name[][SIZE])
+void Least_sold(int sale[], char product_name[][SIZE])
 {
-	*ID = 1;
-	*sale_num = sale[0];
-	for (int i = 0; i < *product; i++)
+	int id = -1;
+	int sales = -1;
+
+	for (int i = 1; i <= MAX_PRODUCTS; i++)
 	{
-		if (*sale_num > sale[i])
+		if (product_name[i][0] != '\0')
 		{
-			*sale_num = sale[i];
-			*ID = (i + 1);
+			if (id == -1 || sale[i] < sales)
+			{
+				sales = sale[i];
+				id = i;
+			}
 		}
 	}
-	printf("°¡Àå Àû°Ô ÆÇ¸ÅµÈ »óÇ° : ID %d, »óÇ°¸í : %s, ÆÇ¸Å·® %d\n", *ID, product_name[*ID - 1], *sale_num);
+
+	if (id != -1)
+		printf("ê°€ì¥ ì ê²Œ íŒë§¤ëœ ìƒí’ˆ : ID %d, ìƒí’ˆëª… : %s, íŒë§¤ëŸ‰ %d\n", id, product_name[id], sales);
+}
+
+void save_data(int inventory[], int sale[], int price[], char product_name[][SIZE])
+{
+	FILE* fp = NULL;
+	const char* filename = "shopping.bin";
+
+	if (fopen_s(&fp, filename, "wb") != 0)
+	{
+		printf("%s íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n\n", filename);
+		return;
+	}
+
+	for (int i = 1; i <= MAX_PRODUCTS; i++)
+	{
+		if (product_name[i][0] != '\0')
+		{
+			PRODUCT p = {};
+			p.id = i;
+			strcpy_s(p.name, SIZE, product_name[i]);
+			p.inventory = inventory[i];
+			p.sale = sale[i];
+			p.price = price[i];
+			fwrite(&p, sizeof(PRODUCT), 1, fp);
+		}
+	}
+	fclose(fp);
+	printf("%s ì €ì¥ë¨", filename);
+}
+
+void load_data(int inventory[], int sale[], int price[], char product_name[][SIZE])
+{
+	FILE* fp = NULL;
+	const char* filename = "shopping.bin";
+
+	if (fopen_s(&fp, filename, "rb") != 0)
+	{
+		printf("%s íŒŒì¼ì´ ì—†ìŠµë‹ˆë‹¤.\n\n", filename);
+		return;
+	}
+
+	//ê¸°ì¡´ ë°ì´í„° ì´ˆê¸°í™” í•˜ëŠ”ì¤‘VVV
+	for (int i = 1; i <= MAX_PRODUCTS; i++)
+	{
+		inventory[i] = 0;
+		sale[i] = 0;
+		price[i] = 0;
+		product_name[i][0] = '\0';
+	}
+	PRODUCT p;
+
+	while (fread(&p, sizeof(PRODUCT), 1, fp) == 1)
+	{
+		int id = p.id;
+		if (id >= 1 && id <= MAX_PRODUCTS)
+		{
+			strcpy_s(product_name[id], SIZE, p.name);
+			inventory[id] = p.inventory;
+			sale[id] = p.sale;
+			price[id] = p.price;
+		}
+	}
+
+	fclose(fp);
+	printf("%s íŒŒì¼ì—ì„œ ìƒí’ˆ ì •ë³´ë¥¼ ì„±ê³µì ìœ¼ë¡œ ë¶ˆëŸ¬ì™”ìŠµë‹ˆë‹¤.\n\n", filename);
 }
